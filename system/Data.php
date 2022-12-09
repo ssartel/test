@@ -1,8 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace System;
 
 use System\Exceptions\InvalidParamException;
+use System\Data\ParserSelector;
 
 class Data
 {
@@ -35,9 +38,10 @@ class Data
 		$formattedData = [];
 
 		foreach ($this->filesList as $file) {
-			$className = 'System\Data\\' . strtoupper($file['extension']);
 			$data = file_get_contents($file['path']);
-			
+
+            $parser = ParserSelector::getParser($file['extension']);
+
 			$explode = explode(ROUND_SEPARATOR, $file['name']);
 
 			if (empty($data) || !isset($explode[1])) {
@@ -47,7 +51,7 @@ class Data
 			$round = $explode[1];
 			$endPoint = $explode[0];
 
-			$formattedData[$round][$endPoint] = $className::parseData($data, $this->dataTemplate[$endPoint]);
+			$formattedData[$round][$endPoint] = $parser->parseData($data, $this->dataTemplate[$endPoint]);
 		}
 		
 		$this->formattedData = $formattedData;

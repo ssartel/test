@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace System;
 
 use System\Exceptions\InvalidParamException;
@@ -69,7 +71,12 @@ class CURL
 		$data['requestUrl'] = $this->url;
 
 		$this->requestData  = $data;
-		$this->responseData  = curl_exec($ch);
+
+        $response  = curl_exec($ch);
+
+        if (is_string($response)) {
+            $this->responseData  = $response;
+        }
 
 		$this->curlInfo["headers"]     = curl_getinfo($ch, CURLINFO_HEADER_OUT);
 		$this->curlInfo["info"]        = curl_getinfo($ch);

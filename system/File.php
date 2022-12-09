@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace System;
 
 use RuntimeException;
@@ -67,10 +69,10 @@ class File
 			self::createDir($fullPath);
 		}
 
-		return $fullPath;
+		return $fullPath . '/';
 	}
 
-	public static function createDir($dir) : void
+	public static function createDir(string $dir) : void
 	{
 		if (!is_dir($dir) && !mkdir($dir, 0775) && !is_dir($dir)) {
 			throw new RuntimeException("Directory $dir was not created");

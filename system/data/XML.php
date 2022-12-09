@@ -7,7 +7,7 @@ use System\Contracts\ParseDataInterface;
 
 class XML implements ParseDataInterface
 {
-	public static function parseData(string $data, array $needleElements) : array
+	public function parseData(string $data, array $needleElements) : array
 	{
 		$fullData = [];
 

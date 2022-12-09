@@ -6,7 +6,7 @@ use System\Contracts\ParseDataInterface;
 
 class JSON implements ParseDataInterface
 {
-	public static function parseData(string $data, array $needleElements) : array
+	public function parseData(string $data, array $needleElements) : array
 	{
 		$fullData = [];
 

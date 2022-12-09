@@ -21,4 +21,4 @@ try {
 	echo $e->getMessage();
 }
 
-echo 'All requests are send.';
+echo "All requests are send. <a href='{$controller->logPath}' target='_blank'>Details</a>";

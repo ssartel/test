@@ -5,11 +5,13 @@ declare(strict_types=1);
 use System\CURL;
 use System\Data;
 use System\Exceptions\InvalidParamException;
+use System\File;
 use System\Log;
 
 class Controller
 {
     protected Data $data;
+    public string $logPath = '';
 
     public function __construct(Data $data)
     {
@@ -22,8 +24,12 @@ class Controller
             throw new InvalidParamException('empty data array');
         }
 
-        $logPathArray = [date('Y'), date('m'), date('d')];
-        $logFileName = date('H-i');
+        if (empty($this->logPath)) {
+            $logPathArray = [date('Y'), date('m'), date('d')];
+            $logFileName = date('H-i');
+
+            $this->logPath = File::generateDir($logPathArray) . $logFileName . '.txt';
+        }
 
         foreach ($this->data->formattedData as $data) {
             krsort($data);
@@ -40,12 +46,19 @@ class Controller
                 $dataToLog = [
                     'request_type' => $RequestType,
                     'round_id' => $data[$roundPart]['round_id'],
-                    'success' => (bool)$response->success,
-                    'error_message' => $response->success ? '' : $response->message,
-                    'action_id' => $response->success ? $response->action_id : '',
                     ];
 
-                Log::write($logPathArray, $dataToLog, $logFileName);
+                if (!$response) {
+                    $dataToLog['error_message'] = 'incorrect answer';
+                } else {
+                    $dataToLog += [
+                        'success' => (bool)$response->success,
+                        'error_message' => $response->success ? '' : $response->message,
+                        'action_id' => $response->success ? $response->action_id : '',
+                    ];
+                }
+
+                Log::write($this->logPath, $dataToLog);
             }
         }
     }
@@ -55,7 +68,7 @@ class Controller
         $curl = new CURL($url);
         $curl->setHeaders(["Content-Type: application/json"]);
         $curl->setPost($data);
-        $curl->addParams([CURLOPT_CONNECTTIMEOUT => 3]);
+        $curl->addParams([CURLOPT_TIMEOUT => 3]);
         $curl->send();
 
         return $curl->getResponseData();
